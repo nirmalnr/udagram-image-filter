@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import {filterImageFromURLAsync, deleteLocalFiles} from './util/util';
 
 (async () => {
 
@@ -34,14 +34,21 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
     let path : any = ""
     console.log("help")
     try {
-      path = await filterImageFromURL(url);  
+      path = await filterImageFromURLAsync(url);  
     } catch (error) {
       console.log(error);
       res.status(400).send('Please recheck input URL');
       return;
     }
     console.log("PATH",path);
-    res.sendFile(path);
+    res.sendFile(path, (error) => {
+      if(error) {
+        res.sendStatus(500);
+        return;
+      } else {
+        deleteLocalFiles([path]);
+      }
+    });
   });
   
   // Root Endpoint

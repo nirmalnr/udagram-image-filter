@@ -22,6 +22,21 @@ export async function filterImageFromURL(inputURL: string): Promise<string>{
     });
 }
 
+export async function filterImageFromURLAsync(inputURL: string): Promise<string>{
+    console.log('1');
+    let photo;
+    try {
+        photo = await Jimp.read(inputURL);  
+        console.log('3');
+        const outpath = '/tmp/filtered.'+Math.floor(Math.random() * 2000)+'.jpg';
+        await  photo.resize(256, 256).quality(60).greyscale().writeAsync(__dirname+outpath);
+        return __dirname+outpath;      
+    } catch (error) {
+        console.log('2')
+        throw error;
+    }
+}
+
 // deleteLocalFiles
 // helper function to delete files on the local disk
 // useful to cleanup after tasks
