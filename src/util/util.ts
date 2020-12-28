@@ -23,16 +23,13 @@ export async function filterImageFromURL(inputURL: string): Promise<string>{
 }
 
 export async function filterImageFromURLAsync(inputURL: string): Promise<string>{
-    console.log('1');
     let photo;
     try {
         photo = await Jimp.read(inputURL);  
-        console.log('3');
         const outpath = '/tmp/filtered.'+Math.floor(Math.random() * 2000)+'.jpg';
         await  photo.resize(256, 256).quality(60).greyscale().writeAsync(__dirname+outpath);
         return __dirname+outpath;      
     } catch (error) {
-        console.log('2')
         throw error;
     }
 }
@@ -46,4 +43,10 @@ export async function deleteLocalFiles(files:Array<string>){
     for( let file of files) {
         fs.unlinkSync(file);
     }
+}
+
+//helper function which deletes all files in tmp directory
+export async function deleteAllTempFiles() {
+    const temp = fs.readdirSync(__dirname+'/util/tmp'); // Get all files in temp directory 
+    deleteLocalFiles(temp.map(x => __dirname+'/util/tmp/'+x)); //Clear out temp directory 
 }
