@@ -47,6 +47,6 @@ export async function deleteLocalFiles(files:Array<string>){
 
 //helper function which deletes all files in tmp directory
 export async function deleteAllTempFiles() {
-    const temp = fs.readdirSync(__dirname+'/util/tmp'); // Get all files in temp directory 
-    deleteLocalFiles(temp.map(x => __dirname+'/util/tmp/'+x)); //Clear out temp directory 
+    const temp = fs.readdirSync(__dirname+'/tmp'); // Get all files in temp directory 
+    deleteLocalFiles(temp.map(x => __dirname+'/tmp/'+x)); //Clear out temp directory 
 }

@@ -25,7 +25,6 @@ import {filterImageFromURLAsync, deleteAllTempFiles} from './util/util';
   // RETURNS
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
   /**************************************************************************** */
-
   app.get("/filteredimage", async (req, res) => {
     const url = req.query.image_url;
     let path : string = ""
@@ -34,10 +33,12 @@ import {filterImageFromURLAsync, deleteAllTempFiles} from './util/util';
     } catch (error) {
       console.log("ERROR",error);
       console.log("URL",url);
+      deleteAllTempFiles();
       res.status(422).send('Sorry. Something went wrong. Please recheck the input URL');
       return;
     }
     if(path==""){
+      deleteAllTempFiles();
       res.status(422).send('Sorry. Something went wrong. Please recheck the input URL');
       return;
     }
@@ -50,7 +51,7 @@ import {filterImageFromURLAsync, deleteAllTempFiles} from './util/util';
       }
     });
   });
-  
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get( "/", async ( req, res ) => {
