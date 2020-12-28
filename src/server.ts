@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURLAsync, deleteAllTempFiles} from './util/util';
+import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth} from './util/util';
 
 (async () => {
 
@@ -25,7 +25,7 @@ import {filterImageFromURLAsync, deleteAllTempFiles} from './util/util';
   // RETURNS
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
   /**************************************************************************** */
-  app.get("/filteredimage", async (req, res) => {
+  app.get("/filteredimage", requireAuth, async (req, res) => {
     const url = req.query.image_url;
     let path : string = ""
     try {
