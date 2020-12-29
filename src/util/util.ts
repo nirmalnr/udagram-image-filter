@@ -3,6 +3,8 @@ import Jimp = require('jimp');
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'connect';
+import { reject, resolve } from 'bluebird';
+import * as https from 'https';
 
 // filterImageFromURL
 // helper function to download, filter, and save the filtered image locally
@@ -37,6 +39,52 @@ export async function filterImageFromURLAsync(inputURL: string): Promise<string>
     }
 }
 
+async function download(url:string, path:string) {
+    return new Promise( (resolve, reject) => {
+        const file = fs.createWriteStream(path, { flags: "wx" });
+        const request = https.get(url, (resp) => { 
+            if(resp.statusCode === 200) {
+                resp.pipe(file)
+            } else {
+                file.close();
+                fs.unlinkSync(path); // Delete temp file
+                reject(`Server responded with ${resp.statusCode}: ${resp.statusMessage}`);
+            }
+            request.on("error", err => {
+                file.close();
+                fs.unlinkSync(path); // Delete temp file
+                reject(err.message);
+            });
+            file.on("finish", () => {
+                resolve();
+            });
+            file.on("error", err => {
+                file.close();
+                if (err.code === "EEXIST") {
+                    reject("File already exists");
+                } else {
+                    fs.unlinkSync(path); // Delete temp file
+                    reject(err.message);
+                }
+            });
+        });
+    })
+}
+
+export async function downloadImageFromURLAsync(inputURL: string): Promise<string>{
+    let photo;
+    try {
+        const inpath = '/tmp/input.'+Math.floor(Math.random() * 2000)+'.jpg';
+        await download(inputURL,__dirname+inpath);
+        photo = await Jimp.read(__dirname+inpath);
+        const outpath = '/tmp/filtered.'+Math.floor(Math.random() * 2000)+'.jpg';
+        await  photo.resize(256, 256).quality(60).greyscale().writeAsync(__dirname+outpath);
+        return __dirname+outpath;      
+    } catch (error) {
+        throw error;
+    }
+}
+
 // deleteLocalFiles
 // helper function to delete files on the local disk
 // useful to cleanup after tasks
@@ -55,6 +103,9 @@ export async function deleteAllTempFiles() {
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+    if( process.env.OVERRIDE_AUTH == 'Y'){ //Bypass auth
+        return next();
+    }
     if (!req.headers || !req.headers.authorization){
         return res.status(401).send({ message: 'No authorization headers.' });
     }
@@ -66,10 +117,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     const token = token_bearer[1];
 
     return jwt.verify(token, process.env.JWT_SECRET , (err, decoded) => {
-      if (err) {
+      if(err) {
         return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
       }
-      console.log(`Requested by ${decoded.email}`); //Get who the request is from.
+      console.log(`Requested by ${decoded.email}`); //Log who the request is from.
       return next();
     });
 }

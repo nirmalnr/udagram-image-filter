@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth} from './util/util';
+import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth, downloadImageFromURLAsync} from './util/util';
 
 (async () => {
 
@@ -39,6 +39,35 @@ import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth} from './util/u
     }
     if(path==""){
       deleteAllTempFiles();
+      res.status(422).send('Sorry. Something went wrong. Please recheck the input URL');
+      return;
+    }
+    res.sendFile(path, (error) => {
+      if(error) {
+        res.sendStatus(500);
+        return;
+      } else {
+        deleteAllTempFiles(); //Clear out temp directory 
+      }
+    });
+  });
+
+  //GET /downloadAndFilterImage
+  //Endpoint accepts input url as image_url in body parameter
+  //Downloads the image and applies filer and sends it back
+  //Created to work with s3 bucket signed URL of images 
+  app.get("/downloadAndFilterImage", async (req, res) => {
+    const url = req.body.image_url;
+    let path : string = ""
+    try {
+      path = await downloadImageFromURLAsync(url);  
+    } catch (error) {
+      console.log("ERROR",error);
+      console.log("URL",url);
+      res.status(422).send('Sorry. Something went wrong. Please recheck the input URL');
+      return;
+    }
+    if(path==""){
       res.status(422).send('Sorry. Something went wrong. Please recheck the input URL');
       return;
     }
