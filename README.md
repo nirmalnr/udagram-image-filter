@@ -20,3 +20,5 @@ Created to work with S3 bucket signed URL of images since directly passing the U
 ## Authentication
 
 Uses the same secret used in main udagram application to check if the authorization token can be verified. If verified logs the user that made the request. An override option of this functionality has been provided based on process property value.
+
+Endpoint : http://udagram-filter-dev-dev.us-east-2.elasticbeanstalk.com/
