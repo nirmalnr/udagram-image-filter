@@ -23,4 +23,4 @@ Uses the same secret used in main udagram application to check if the authorizat
 
 Endpoint : http://udagram-filter-dev-dev.us-east-2.elasticbeanstalk.com/
 
-#### In the postman collection for testing filtering with s3 bucket URL pre-request script has been added which calls the udacity endpoint to get a post and sends that URL as the request to the filter api endpoint.
+#### In the postman collection for testing filtering with s3 bucket URL pre-request script has been added which calls the udagram endpoint to get a post and sends that URL as the request to the filter api endpoint.
