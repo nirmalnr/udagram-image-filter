@@ -120,7 +120,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
       if(err) {
         return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
       }
-      console.log(`Requested by ${decoded.email}`); //Log who the request is from.
+      console.log(`Requested by ${(decoded as any).email}`); //Log who the request is from.
       return next();
     });
 }
