@@ -3,7 +3,6 @@ import Jimp = require('jimp');
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'connect';
-import { reject, resolve } from 'bluebird';
 import * as https from 'https';
 
 // filterImageFromURL
@@ -39,7 +38,7 @@ export async function filterImageFromURLAsync(inputURL: string): Promise<string>
     }
 }
 
-async function download(url:string, path:string) {
+async function download(url:string, path:string): Promise<void>{
     return new Promise( (resolve, reject) => {
         const file = fs.createWriteStream(path, { flags: "wx" });
         const request = https.get(url, (resp) => { 
@@ -90,19 +89,19 @@ export async function downloadImageFromURLAsync(inputURL: string): Promise<strin
 // useful to cleanup after tasks
 // INPUTS
 //    files: Array<string> an array of absolute paths to files
-export async function deleteLocalFiles(files:Array<string>){
+export async function deleteLocalFiles(files:Array<string>): Promise<void>{
     for( let file of files) {
         fs.unlinkSync(file);
     }
 }
 
 //helper function which deletes all files in tmp directory
-export async function deleteAllTempFiles() {
+export async function deleteAllTempFiles(): Promise<void>{
     const temp = fs.readdirSync(__dirname+'/tmp'); // Get all files in temp directory 
     deleteLocalFiles(temp.map(x => __dirname+'/tmp/'+x)); //Clear out temp directory 
 }
 
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
+export function requireAuth(req: Request, res: Response, next: NextFunction): void|Response{
     if( process.env.OVERRIDE_AUTH == 'Y'){ //Bypass auth
         return next();
     }

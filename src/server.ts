@@ -25,7 +25,7 @@ import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth, downloadImageF
   // RETURNS
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
   /**************************************************************************** */
-  app.get("/filteredimage", requireAuth, async (req, res) => {
+  app.get("/filteredimage", requireAuth, async (req:express.Request, res:express.Response) => {
     const url = req.query.image_url;
     let path : string = ""
     try {
@@ -56,7 +56,7 @@ import {filterImageFromURLAsync, deleteAllTempFiles, requireAuth, downloadImageF
   //Endpoint accepts input url as image_url in body parameter
   //Downloads the image and applies filer and sends it back
   //Created to work with s3 bucket signed URL of images 
-  app.get("/downloadAndFilterImage", async (req, res) => {
+  app.get("/downloadAndFilterImage", async (req:express.Request, res:express.Response) => {
     const url = req.body.image_url;
     let path : string = ""
     try {
